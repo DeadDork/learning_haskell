@@ -1,0 +1,4 @@
+README
+======
+
+I learn by fiddling and experimenting. This repo houses my fiddles and experiments in Haskell.
