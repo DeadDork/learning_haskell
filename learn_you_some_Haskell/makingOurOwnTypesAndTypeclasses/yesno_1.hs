@@ -45,3 +45,20 @@ instance YesNo TrafficLight where
 -- True
 -- ghci> :t yesno 
 -- yesno :: YesNo a => a -> Bool
+
+yesnoIf :: (YesNo a) => a -> b -> b -> b
+yesnoIf yesnoVal yes no = if yesno yesnoVal then yes else no
+
+-- Tests:
+-- ghci> yesnoIf Nothing "YEAH!" "NO!"
+-- "NO!"
+-- ghci> yesnoIf [] "YEAH!" "NO!"
+-- "NO!"
+-- ghci> yesnoIf [2,3,4] "YEAH!" "NO!" 
+-- "YEAH!"
+-- ghci> yesnoIf True "YEAH!" "NO!"
+-- "YEAH!"
+-- ghci> yesnoIf (Just 500) "YEAH!" "NO!"
+-- "YEAH!"
+-- ghci> yesnoIf Nothing "YEAH!" "NO!"
+-- "NO!"
