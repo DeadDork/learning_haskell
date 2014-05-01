@@ -19,3 +19,7 @@ instance Show_ Traffic where
     show_ Red    = "Red"
     show_ Yellow = "Yellow"
     show_ Green  = "Green"
+
+elem_ :: (Eq_ a) => a -> [a] -> Bool
+elem_ x [] = False
+elem_ x xs = foldr (\y a -> if x === y then True else a) False xs
