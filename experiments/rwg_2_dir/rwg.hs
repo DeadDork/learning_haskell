@@ -36,8 +36,8 @@ getWordListTry = do
 
 -- Some 980 common nouns
 emergencyWordList :: [String]
-emergencyWordList = [
-    "account",
+emergencyWordList = 
+    ["account",
     "achiever",
     "acoustics",
     "act",
@@ -1016,5 +1016,4 @@ emergencyWordList = [
     "zephyr",
     "zinc",
     "zipper",
-    "zoo"
-    ]
+    "zoo"]
