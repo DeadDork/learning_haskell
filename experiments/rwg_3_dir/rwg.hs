@@ -12,7 +12,7 @@ data RWGArg = RWGArg { number :: Int
                      } deriving (Data,Typeable,Show)
 
 rwgArg = cmdArgsMode $ RWGArg
-    { number = 4 &= typ "NUMBER" &= help "NUMBER defaults to 4. If NUMBER < 0, sets NUMBER to default."
+    { number = 4 &= typ "NUMBER" &= help "NUMBER defaults to 4. If NUMBER < 0, NUMBER set to default."
     , file = "nouns.txt" &= typFile &= help "FILE defaults to 'nouns.txt'. If 'nouns.txt' not found, rwg fails gracefully to an internal ~1,000 word list."
     } &= program "rwg" &= summary "Random Word Generator" 
 
@@ -30,7 +30,6 @@ rwg gen n xs =
         (element, newGen) = randomR (low, high) gen
     in xs !! element : rwg newGen (n-1) xs
 
--- Some 980 common nouns
 emergencyWordList = 
     [ "account"
     , "achiever"
