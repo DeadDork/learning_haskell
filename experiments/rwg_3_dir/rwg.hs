@@ -17,11 +17,10 @@ rwgArg = cmdArgsMode $ RWGArg
     } &= program "rwg" &= summary "Random Word Generator" 
 
 main = do
+    gen <- newStdGen
     args <- cmdArgsRun rwgArg
     let wordNumber = (\n -> if n < 0 then 4 else n) $ number args
     wordList <- (\f -> (readFile f >>= return . lines) `catchIOError` (\e -> return emergencyWordList)) $ file args
-    --wordList <- (\f -> (readFile f >>= return . lines) `catchIOError` (\e -> return testWordList)) $ file args -- Tests the catch
-    gen <- newStdGen
     putStrLn $ intercalate " " (rwg gen wordNumber wordList)
 
 rwg _ 0 _ = []
@@ -1013,11 +1012,3 @@ emergencyWordList =
     , "zinc"
     , "zipper"
     , "zoo"]
-
-testWordList =
-    [ "ASCII"
-    , "binary"
-    , "CS"
-    , "DVORAK"
-    , "EECS"
-    , "Fibonacci"]
