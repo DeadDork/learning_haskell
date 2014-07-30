@@ -27,12 +27,8 @@ rwg gen n xs =
     in xs !! element : rwg newGen (n-1) xs
 
 getWordList :: FilePath -> IO [String]
-getWordList file = do getWordListTry file `IOE.catchIOError` (\e -> return emergencyWordList)
-
-getWordListTry :: FilePath -> IO [String]
-getWordListTry file = do
-    contents <- IO.readFile file
-    return $ Lst.lines contents
+getWordList file = do
+    (IO.readFile file >>= return . Lst.lines) `IOE.catchIOError` (\e -> return emergencyWordList)
 
 -- Some 980 common nouns
 emergencyWordList :: [String]
