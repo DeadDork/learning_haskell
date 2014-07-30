@@ -1,5 +1,5 @@
--- Playing with <http://www.haskell.org/haskellwiki/Tutorials/Programming_Haskell/Argument_handling>
--- cat program.
+-- Playing with the cat program from
+-- <http://www.haskell.org/haskellwiki/Tutorials/Programming_Haskell/Argument_handling>
 
 import System.Console.GetOpt
 import System.IO
@@ -15,12 +15,12 @@ main = do
     when (Unbuffered `elem` args) $ hSetBuffering stdout NoBuffering
     mapM_ (cat args) files
  
-withFile s f = putStr . unlines . f . lines =<< open s
+withFile' s f = putStr . unlines . f . lines =<< open s
   where
     open f = if f == "-" then getContents else readFile f
  
-cat [] f = withFile f id
-cat as f = withFile f (newline . number . visible as)
+cat [] f = withFile' f id
+cat as f = withFile' f (newline . number . visible as)
   where
     number  s    = if Blanks `elem` as then numberSome s else ifset Number numberAll s
     newline s    = ifset Dollar (map (++"$")) s
