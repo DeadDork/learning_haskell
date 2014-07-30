@@ -1,34 +1,41 @@
 {-# LANGUAGE DeriveDataTypeable #-}
 
-import qualified Data.List as Lst
-import qualified System.Console.CmdArgs as Arg
-import qualified System.IO as IO
-import qualified System.IO.Error as IOE
-import qualified System.Random as Rnd
-import qualified System.Environment as Env
+import Data.List
+import System.Console.CmdArgs
+import System.IO
+import System.IO.Error
+import System.Random
+import System.Environment
 
-data RArgs = RArgs { number :: Int
-                   , file :: FilePath
-                   } deriving (Arg.Data,Arg.Typeable,Show)
+data RWGArg = RWGArg { number :: Int
+                       , file :: FilePath
+                       } deriving (Data,Typeable,Show)
+
+rwgArg = cmdArgsMode $ RWGArg
+    { number = 4 &= typ "NUMBER" &= help "NUMBER defaults to 4. If NUMBER < 0, sets NUMBER to default."
+    , file = "nouns.txt" &= typFile &= help "FILE defaults to 'nouns.txt'. If 'nouns.txt' not found, rwg fails gracefully to an internal ~1,000 word list."
+    }
+    &= program "rwg"
+    &= summary "Random Word Generator" 
 
 main = do
-    gen <- Rnd.newStdGen
-    args <- Arg.cmdArgs $ RArgs 4 "nouns.txt"
-    let wordNumber = number args
-    wordList <- getWordList (file args)
-    putStrLn $ Lst.intercalate " " (rwg gen wordNumber wordList)
+    gen <- newStdGen
+    args <- cmdArgsRun rwgArg
+    let wordNumber = (\n -> if n < 0 then 4 else n) $ number args
+    wordList <- getWordList $ file args
+    putStrLn $ intercalate " " (rwg gen wordNumber wordList)
 
-rwg :: (Rnd.RandomGen g, Integral a, Ord b) => g -> a -> [b] -> [b]
+rwg :: (RandomGen g, Integral a, Ord b) => g -> a -> [b] -> [b]
 rwg _ 0 _ = []
 rwg gen n xs =
     let low = 0
-        high = Lst.length xs - 1
-        (element, newGen) = Rnd.randomR (low, high) gen
+        high = length xs - 1
+        (element, newGen) = randomR (low, high) gen
     in xs !! element : rwg newGen (n-1) xs
 
 getWordList :: FilePath -> IO [String]
 getWordList file = do
-    (IO.readFile file >>= return . Lst.lines) `IOE.catchIOError` (\e -> return emergencyWordList)
+    (readFile file >>= return . lines) `catchIOError` (\e -> return emergencyWordList)
 
 -- Some 980 common nouns
 emergencyWordList :: [String]
