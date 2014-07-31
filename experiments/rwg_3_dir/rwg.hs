@@ -1,13 +1,11 @@
 {-# LANGUAGE DeriveDataTypeable #-}
 
--- STDLIB {{{
+-- STDLIB
 import Data.List
 import System.Random
--- }}}
 
--- Hackage {{{
+-- Hackage
 import System.Console.CmdArgs
--- }}}
 
 -- This makes CmdArgs handle program arguments nicely {{{
 data RWGArg = RWGArg { number :: Int
