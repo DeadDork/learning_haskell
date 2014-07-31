@@ -10,7 +10,7 @@ import System.Console.CmdArgs
 -- This makes CmdArgs handle program arguments nicely {{{
 data RWGArg = RWGArg { number :: Int
                      , file :: FilePath
-                     } deriving (Data,Typeable,Show)
+                     } deriving (Data, Typeable, Show)
 
 rwgArg :: Mode (CmdArgs RWGArg)
 rwgArg = cmdArgsMode $ RWGArg
