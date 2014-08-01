@@ -3,11 +3,13 @@
 -- STDLIB
 import Data.List
 import System.Random
+import qualified Data.List as L
 
 -- Hackage
 import System.Console.CmdArgs
+import Data.Vector as V
 
--- This makes CmdArgs handle program arguments nicely {{{
+-- Program arguments {{{
 data RWGArg = RWGArg { number :: Int
                      , file :: FilePath
                      } deriving (Data, Typeable, Show)
@@ -28,15 +30,10 @@ rwgArg = cmdArgsMode $ RWGArg
 main :: IO ()
 main = do
     gen <- newStdGen
-    arguments <- cmdArgsRun rwgArg
-    let wordNumber = (\ n -> if n < 0 then 4 else n) $ number arguments
-    wordList <- (\ f -> readFile f >>= return . lines) $ file arguments
+    args' <- cmdArgsRun rwgArg
+    let wordNumber = (\ n -> if n < 0 then 4 else n) $ number args'
+    wordList <- (\ f -> readFile f >>= return . V.fromList . lines) $ file args'
     putStrLn $ intercalate " " (rwg gen wordNumber wordList)
 
-rwg :: StdGen -> Int -> [a] -> [a]
-rwg _ 0 _ = []
-rwg gen n xs =
-    let low = 0
-        high = length xs - 1
-        (element, newGen) = randomR (low, high) gen
-    in xs !! element : rwg newGen (n - 1) xs
+rwg :: StdGen -> Int -> V.Vector String -> [String]
+rwg gen n v = L.map (\ x -> v ! x) $ L.take n $ randomRs (0, V.length v - 1) gen
