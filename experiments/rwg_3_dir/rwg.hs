@@ -19,9 +19,9 @@ rwgArg = cmdArgsMode $ RWGArg
     { number = 4 
         &= typ "NUMBER"
         &= help "NUMBER defaults to 4. If NUMBER < 0, NUMBER set to default."
-    , file = "nouns.txt"
+    , file = "noun.txt"
         &= typFile
-        &= help "FILE defaults to 'nouns.txt'."
+        &= help "FILE defaults to 'noun.txt'."
     }
         &= program "rwg"
         &= summary "Random Word Generator v0.3, (C) Nimrod Omer 2014"
