@@ -59,8 +59,8 @@ getK o s
 rot :: Int -> Map.Map Char Char
 rot o =
     let rotate n c z = if ord c + n <= ord z
-                     then chr $ ord c + n
-                     else rotate (n - alphaSize) c z
+                       then chr $ ord c + n
+                       else rotate (n - alphaSize) c z
         rotator c = rotate o c $ if isUpper c then 'Z' else 'z'
     in Map.map rotator basicKey
     where alphaSize = 26
@@ -92,8 +92,8 @@ getKey Decrypt dict =
 
 getInput' :: Maybe FilePath -> IO String
 getInput' f = if isNothing f
-                 then getContents
-                 else readFile $ fromJust f
+              then getContents
+              else readFile $ fromJust f
 
 crypt :: Map.Map Char Char -> Char -> Char
 crypt key c = if isAlpha c
