@@ -1,0 +1,102 @@
+{-# LANGUAGE DeriveDataTypeable #-}
+
+-- Comments
+
+-- This is just a slightly more feature-ful version of the Caesar cypher. It
+-- lets you select from a handful of different substitution cyphers:
+--  (a) a rotating cypher (e.g. Rot-13)
+--  (b) an arbitrary cypher (e.g. 'a' = 'l', 'b' = 'z', 'c' = 'b')
+
+-- StdLib
+import Data.Char
+import qualified Data.Map.Strict as Map
+import Data.Maybe
+import Data.Tuple
+import Text.ParserCombinators.Parsec
+
+-- Hackage
+import System.Console.CmdArgs
+
+data CryptMode = Encrypt | Decrypt deriving (Eq, Data, Typeable, Show)
+
+data CypherArgs = CypherArgs { cryptMode :: CryptMode
+                             , offset :: Int
+                             , substitutionFile :: Maybe FilePath
+                             , input :: Maybe FilePath
+                             } deriving (Data, Typeable, Show)
+
+main :: IO ()
+main = do
+    argv <- cmdArgsRun argMode
+    k <- getK (offset argv) (substitutionFile argv)
+    let key = getKey (cryptMode argv) k
+    s <- getInput' (input argv)
+    putStrLn $ map (crypt key) s
+
+argMode :: Mode (CmdArgs CypherArgs)
+argMode = cmdArgsMode $ CypherArgs 
+    { cryptMode = Encrypt
+        &= typ "CRYPTMODE"
+        &= help "Set the mode to either Encrypt or Decrypt (defaults to Encrypt)."
+    , offset = 13
+        &= typ "INTEGER"
+        &= help "Set the offset for the Caesar cypher (defaults to 13)."
+    , substitutionFile = Nothing
+        &= typFile
+        &= help "Optionally set an arbitrary substitution key from a file (will negate any offset entered)."
+    , input = Nothing
+        &= typ "INPUT"
+        &= help "Set input (defaults to STDIN, but can be a file)."
+    }
+      &= program "caesarCypher"
+      &= summary "Arbitrary Caesar cypher v0.2, (C) Nimrod Omer 2014"
+
+getK :: Int -> Maybe FilePath -> IO (Map.Map Char Char)
+getK o s
+    | isNothing s = return $ rot o
+    | otherwise = sub $ fromJust s
+
+rot :: Int -> Map.Map Char Char
+rot o =
+    let rotate n c z = if ord c + n <= ord z
+                     then chr $ ord c + n
+                     else rotate (n - alphaSize) c z
+        rotator c = rotate o c $ if isUpper c then 'Z' else 'z'
+    in Map.map rotator basicKey
+    where alphaSize = 26
+
+basicKey :: Map.Map Char Char
+basicKey = Map.fromList [(x, x) | x <- ['A' .. 'z'], isAlpha x]
+
+sub :: FilePath -> IO (Map.Map Char Char)
+sub f = do
+    subFile <- readFile f
+    let subKey = case parse (pair `endBy` char '\n') "" subFile of
+         Left _ -> basicKey
+         Right r -> Map.fromList r
+    return $ Map.union subKey basicKey
+
+pair :: GenParser Char st (Char, Char)
+pair = do
+    k <- letter
+    _ <- char ':'
+    v <- letter
+    return (k, v)
+
+getKey :: CryptMode -> Map.Map Char Char -> Map.Map Char Char
+getKey Encrypt dict = dict
+getKey Decrypt dict =
+    let swapMap m = Map.fromList . map swap $ uniqueList m
+        uniqueList m = Map.toList . Map.filterWithKey (\ k v -> k /= v) $ m
+    in (swapMap dict) `Map.union` basicKey
+
+getInput' :: Maybe FilePath -> IO String
+getInput' f = if isNothing f
+                 then getContents
+                 else readFile $ fromJust f
+
+crypt :: Map.Map Char Char -> Char -> Char
+crypt key c = if isAlpha c
+              then case c `Map.lookup` key of Nothing -> c
+                                              Just x -> x
+              else c
