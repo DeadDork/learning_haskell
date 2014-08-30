@@ -7,6 +7,15 @@ data LockerState = Taken | Free deriving (Show, Eq)
 type Code = String
 type LockerMap = Map.Map Int (LockerState, Code)
 
+lockers :: LockerMap  
+lockers = Map.fromList [ (100, (Taken,"ZD39I"))  
+                       , (101, (Free,"JAH3I"))  
+                       , (103, (Free,"IQSA9"))  
+                       , (105, (Free,"QOTSA"))  
+                       , (109, (Taken,"893JJ"))  
+                       , (110, (Taken,"99292"))  
+                       ]  
+
 {- Version 1
 lockerLookup :: Int -> LockerMap -> Either String Code
 lockerLookup lNumber lMap = case lNumber `Map.lookup` lMap of
@@ -34,9 +43,9 @@ lLookup (Just (state, code)) = if state /= Taken
 type Error = String
 
 lockerLookup :: Int -> LockerMap -> Either Error Code
-lockerLookup n m = let ln = "Locker number " ++ show n
-                       f Nothing = Left $ ln ++ " does not exist."
-                       f (Just (s, c)) = g s c
-                       g Taken _ = Left $ " already taken."
-                       g _ c = Right c
-                   in f $ n `Map.lookup` m
+lockerLookup n m =
+    let f Nothing = Left $ "Locker number " ++ show n ++ " does not exist."
+        f (Just (s, c)) = g s c
+        g Taken _ = Left $ "Locker number " ++ show n ++ " already taken."
+        g Free c = Right c
+    in f $ n `Map.lookup` m
