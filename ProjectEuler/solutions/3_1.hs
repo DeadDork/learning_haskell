@@ -3,12 +3,12 @@
 main = putStrLn $ show $ largestPrimeFactor 600851475143
 
 largestPrimeFactor :: Integer -> Integer
-largestPrimeFactor n = lpt n primes
+largestPrimeFactor n = lpf n primes
 
-lpt :: Integer -> [Integer] -> Integer
-lpt n (x:xs) | x == n = x
-             | n `mod` x == 0 = lpt (n `div` x) (x:xs)
-             | otherwise = lpt n xs
+lpf :: Integer -> [Integer] -> Integer
+lpf n (x:xs) | x == n = x
+             | n `mod` x == 0 = lpf (n `div` x) (x:xs)
+             | otherwise = lpf n xs
 
 primes :: [Integer]
 primes = sieve (\ x y -> y `mod` x /= 0) [2..]
