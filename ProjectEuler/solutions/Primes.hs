@@ -1,5 +1,6 @@
 module Primes
 ( prime
+, primes
 ) where
 
 prime :: Integer -> Bool
