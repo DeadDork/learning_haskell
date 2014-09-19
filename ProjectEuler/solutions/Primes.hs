@@ -2,6 +2,7 @@ module Primes
 ( prime
 , primes
 , factors
+, Natural
 ) where
 
 import Data.Natural
