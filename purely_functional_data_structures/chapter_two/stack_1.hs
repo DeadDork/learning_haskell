@@ -5,9 +5,10 @@ module Stack
 , cons
 , head
 , tail
+, (++)
 ) where
 
-  import Prelude hiding (head, tail)
+  import Prelude hiding (head, tail, (++))
 
   data Stack a = Empty
                | Cons a (Stack a)
@@ -30,3 +31,9 @@ module Stack
   tail :: Stack a -> Maybe (Stack a)
   tail Empty = Nothing
   tail (x `Cons` xs) = Just xs
+
+  infixr 5 ++
+  (++) :: Stack a -> Stack a -> Stack a
+  Empty ++ ys = ys
+  (x `Cons` xs) ++ ys = x `Cons` (xs ++ ys)
+
