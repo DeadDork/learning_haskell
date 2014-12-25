@@ -1,11 +1,11 @@
 -- I was having with a length function in a different program, testing it out
 -- here.
 
--- Conclusion: `let` is scoped. Keep in mind that `do` notation & the monadic
--- functions can be decomposed into deepening nesting of case expressions.
--- Let expressions in these expressions would be scoped, thereby making it
--- impossible to declare an exhaustive case & non-exhaustive case for a
--- recursive algorithm that's not in one statement.
+-- Conclusion: my initial two attempts to pattern match a `let` function
+-- failed. After reading 3.14 of the 2010 report & figuring out how
+-- `do` expressions decompose into the Haskell kernel, I understand why.
+-- Namely, the `let` expressions I was trying to pattern match on where
+-- frankly different `let` expressions altogether.
 
 data Stack a = Empty | a `Cons` (Stack a) deriving (Eq, Ord, Read, Show)
 
@@ -24,15 +24,18 @@ f xs = do
   -- let length2 Empty = 0
   -- }
   -- let len = length1 xs -- works (control)
-  let length2 as = case as of
-                        Empty         -> 0
-                        (_ `Cons` bs) -> 1 + length2 bs -- works
+  -- let length2 as = case as of
+  --                       Empty         -> 0
+  --                       (_ `Cons` bs) -> 1 + length2 bs -- works
+  let length2 (a `Cons` as) = 1 + length2 as
+      length2 Empty = 0
+   in do -- works!!!
   let len = length2 xs
   if len == 0
      then Nothing
      else Just len
 
--- E.G. (Same error for both iterations):
+-- E.G. (Same error for the two initial iterations):
 -- *Main> :l length_1.hs
 -- [1 of 1] Compiling Main             ( length_1.hs, interpreted )
 -- Ok, modules loaded: Main.
