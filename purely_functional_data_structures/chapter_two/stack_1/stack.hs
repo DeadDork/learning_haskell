@@ -41,6 +41,14 @@ module Stack
   (x `Cons` xs) ++ ys = x `Cons` (xs ++ ys)
 
   update :: Stack a -> Natural -> a -> Maybe (Stack a)
-  update Empty _ _ = Nothing
-  update (x `Cons` xs) 0 y = Just (y `Cons` xs)
-  update (x `Cons` xs) i y = Just (x `Cons` (update xs (i - 1) y))
+  update xs i y = do
+    let update' Empty 0 _ = Empty
+        update' (a `Cons` as) 0 b = b `Cons` as
+        update' (a `Cons` as) n b = a `Cons` (update' as (n - 1) b)
+     in do
+       let length' Empty = 0
+           length' (a `Cons` as) = 1 + length' as
+        in do
+          if length' xs <= i
+             then Nothing
+             else return $ update' xs i y
