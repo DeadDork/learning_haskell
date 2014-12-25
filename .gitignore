@@ -4,4 +4,3 @@
 *.hi
 *.o
 .DS_Store
-.cabal-sandbox
