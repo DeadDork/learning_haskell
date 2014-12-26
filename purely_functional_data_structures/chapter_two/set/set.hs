@@ -4,6 +4,9 @@ module Set
 , fromList
 , insert
 , member
+, toList
+, treeFoldr
+, treeFoldl
 ) where
 
   data Tree a = Empty | Node a (Tree a) (Tree a) deriving (Eq, Read, Show)
@@ -44,9 +47,18 @@ module Set
   toList :: (Ord a) => Set a -> [a]
   toList = treeFoldr (:) []
 
+  -- Remember: the accumulator is on the right in the foldr function
   treeFoldr :: (Ord a) => (a -> b -> b) -> b -> Set a -> b
   treeFoldr _ a Empty = a
   treeFoldr f a (Node x Empty Empty) = f x a
   treeFoldr f a (Node x Empty right) = f x $ treeFoldr f a right
   treeFoldr f a (Node x left right) = treeFoldr f (f x $ treeFoldr f a right) left
   treeFoldr f a (Node x left Empty) = f x $ treeFoldr f a left
+
+  -- Remember: the accumulator is on the left in the foldl function
+  treeFoldl :: (Ord a) => (b -> a -> b) -> b -> Set a -> b
+  treeFoldl _ a Empty = a
+  treeFoldl f a (Node x Empty Empty) = f a x
+  treeFoldl f a (Node x left Empty) = f (treeFoldl f a left) x
+  treeFoldl f a (Node x left right) = treeFoldl f (f (treeFoldl f a left) x) right
+  treeFoldl f a (Node x Empty right) = f (treeFoldl f a right) x
