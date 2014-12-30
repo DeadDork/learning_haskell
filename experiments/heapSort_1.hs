@@ -6,9 +6,8 @@ module Sort
 , toList
 ) where
 
-  import qualified Data.Vector.Unboxed as V
+  import qualified Data.Vector.Unboxed as U
   import qualified Data.Vector.Unboxed.Mutable as M
-  import Prelude hiding (length)
 
   type Index = Int
 
@@ -20,13 +19,13 @@ module Sort
     compare Empty _ = LT
     compare (Node _ vl _ _) (Node _ vr _ _) = compare vl vr
 
-  fromList :: (Ord a, V.Unbox a) => [a] -> Heap a
+  fromList :: (Ord a, U.Unbox a) => [a] -> Heap a
   fromList [] = Empty
-  fromList xs = fromList' 0 $ V.fromList xs
+  fromList xs = fromList' 0 $ U.fromList xs
 
-  fromList' :: (Ord a, V.Unbox a) => Index -> V.Vector a -> Heap a
+  fromList' :: (Ord a, U.Unbox a) => Index -> U.Vector a -> Heap a
   fromList' ip vx = heapify $
-    case vx V.!? ip of
+    case vx U.!? ip of
          Nothing -> Empty
          Just vp -> Node ip vp (fromList' il vx) (fromList' ir vx)
            where il = 2 * ip + 1
@@ -43,8 +42,8 @@ module Sort
             -- N.B. These pattern matches don't need to be exhaustive, given
             -- the guards above.
 
-  toList :: (Ord a, V.Unbox a) => Heap a -> [a]
-  toList h = V.toList $ V.create $ do
+  toList :: (Ord a, U.Unbox a) => Heap a -> [a]
+  toList h = U.toList $ U.create $ do
     vec <- M.new $ lengthH h
     massWrite h vec
     return vec
