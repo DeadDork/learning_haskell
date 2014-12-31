@@ -17,18 +17,19 @@ module Sort
   data Heap a = Empty | Node Index a (Heap a) (Heap a) deriving (Eq, Read, Show)
 
   instance (Eq a, Ord a) => Ord (Heap a) where
-    compare Empty Empty = EQ
-    compare _ Empty = GT
-    compare Empty _ = LT
-    compare (Node _ vl _ _) (Node _ vr _ _) = compare vl vr
+    Empty `compare`  Empty = EQ
+    _ `compare` Empty = GT
+    Empty `compare` _ = LT
+    (Node _ vl _ _) `compare` (Node _ vr _ _) = vl `compare` vr
 
+  -- I'm particularly proud of this function.
   fromList :: (Ord a, U.Unbox a) => [a] -> Heap a
   fromList [] = Empty
   fromList xs = fromList' 0 $ U.fromList xs
-    where fromList' ip vx = heapify $
-            case vx U.!? ip of
+    where fromList' ip vec = heapify $
+            case vec U.!? ip of
                  Nothing -> Empty
-                 Just vp -> Node ip vp (fromList' il vx) (fromList' ir vx)
+                 Just vp -> Node ip vp (fromList' il vec) (fromList' ir vec)
                    where il = 2 * ip + 1
                          ir = 2 * ip + 2
 
@@ -41,8 +42,7 @@ module Sort
       where leftSwap (Node ip vp (Node il vl ll rl) r) = Node ip vl (Node il vp ll rl) r
             rightSwap (Node ip vp l (Node ir vr lr rr)) = Node ip vr l (Node ir vp lr rr)
             -- N.B. These pattern matches don't need to be exhaustive, as
-            -- combined with the guards above, you have exhaustive pattern
-            -- matching.
+            -- combined with the guards above, all cases are covered.
 
   toList :: (Ord a, U.Unbox a) => Heap a -> [a]
   toList h = U.toList $ U.create $ do
@@ -57,8 +57,8 @@ module Sort
 
   -- Fastest implementation I could think of. It's O (n) (branching down to the
   -- Empties is a cheap (n + 1) recursions, as is adding (n + 1) 1's). An
-  -- alternative is to compare n log (n) Indexes, but the thunks are more
-  -- expensive than the below.
+  -- alternative is to compare the Indexes of the final rank parents, but
+  -- adding is cheaper.
   length :: Heap a -> Int
   length h = length' h - 1
     where length' Empty = 1
@@ -73,8 +73,9 @@ module Sort
 
   insert ::(Ord a) => a -> Heap a -> Heap a
   insert v Empty = singleton v
-  insert v h = insert' (Sort.length h) v h
-    where insert' i v Empty = Empty
+  insert v h = insert' iNew v h
+    where iNew = (Sort.length h)
+          insert' i v Empty = Empty
           insert' i v (Node j w l r)
             | i == 2 * j + 1 = heapify $ Node j w (Node i v Empty Empty) r
             | i == 2 * j + 2 = heapify $ Node j w l (Node i v Empty Empty)
