@@ -14,7 +14,7 @@
 --
 ----------------------------------------------------------------------------------
 
-module HeapSort (
+module Data.List.Sort.HeapSort (
   heapSort -- * Heap sort
 ) where
 
