@@ -23,7 +23,7 @@ module NaturalNumbers ( Natural ) where
     Natural m + Natural n = Natural (m + n)
     Natural m * Natural n = Natural (m * n)
     Natural m - Natural n = Natural (m - n)
-    abs (Natural n) = Natural (abs n)
+    abs (Natural n) = Natural n
     signum _ = 1
     fromInteger n
       | n < 1 = error "Natural numbers begin at 1."
