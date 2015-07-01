@@ -15,7 +15,7 @@ module NaturalNumbers2
   instance Enum Natural where
     fromEnum n
       | n == One = 0
-      | otherwise = 1 + fromEnum (n - 1)
+      | otherwise = 1 + fromEnum (n - One)
     toEnum = fromInteger . toInteger
 
   instance Real Natural where
