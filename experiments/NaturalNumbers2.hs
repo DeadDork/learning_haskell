@@ -11,8 +11,11 @@ module NaturalNumbers2
             remN = fromInteger $ toInteger m `rem` toInteger n
     toInteger = toInteger . (1 +) . fromEnum
 
+  -- Zero indexed
   instance Enum Natural where
-    fromEnum = fromEnum . toInteger
+    fromEnum n
+      | n == One = 0
+      | otherwise = 1 + fromEnum (n - 1)
     toEnum = fromInteger . toInteger
 
   instance Real Natural where
